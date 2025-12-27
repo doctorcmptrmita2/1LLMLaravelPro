@@ -7,7 +7,21 @@
     
     <title>{{ config('app.name', 'CodexFlow') }}</title>
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6D5CFF',
+                        secondary: '#22D3EE',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="antialiased bg-[#070A12] text-white">
     @yield('content')

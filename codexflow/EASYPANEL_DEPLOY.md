@@ -39,11 +39,11 @@ APP_KEY=base64:YOUR_APP_KEY_HERE
 APP_URL=https://dashboard.codexflow.dev
 
 DB_CONNECTION=pgsql
-DB_HOST=postgres
+DB_HOST=codexflow-dashboard_postgresqlpro
 DB_PORT=5432
-DB_DATABASE=codexflow
-DB_USERNAME=codexflow_user
-DB_PASSWORD=GÜÇLÜ_ŞİFRE_BURAYA
+DB_DATABASE=codexflow-dashboard
+DB_USERNAME=postgres
+DB_PASSWORD=8aac83dc2826870760e6
 
 CACHE_DRIVER=file
 SESSION_DRIVER=file

@@ -17,10 +17,10 @@
                     cost tracking, and intelligent rate limiting.
                 </p>
                 <div class="flex justify-center space-x-4">
-                    <a href="/register" class="px-8 py-3 bg-gradient-to-r from-[#6D5CFF] to-[#22D3EE] rounded-lg font-semibold hover:opacity-90 transition">
+                    <a href="{{ route('register') }}" class="px-8 py-3 bg-gradient-to-r from-[#6D5CFF] to-[#22D3EE] rounded-lg font-semibold hover:opacity-90 transition">
                         Get Started
                     </a>
-                    <a href="/login" class="px-8 py-3 border border-[#6D5CFF] rounded-lg font-semibold hover:bg-[#6D5CFF]/10 transition">
+                    <a href="{{ route('login') }}" class="px-8 py-3 border border-[#6D5CFF] rounded-lg font-semibold hover:bg-[#6D5CFF]/10 transition">
                         Sign In
                     </a>
                 </div>
@@ -84,7 +84,7 @@
             <p class="text-xl mb-8 opacity-90">
                 Join thousands of developers using CodexFlow to manage their AI APIs
             </p>
-            <a href="/register" class="inline-block px-8 py-3 bg-white text-[#6D5CFF] rounded-lg font-semibold hover:opacity-90 transition">
+            <a href="{{ route('register') }}" class="inline-block px-8 py-3 bg-white text-[#6D5CFF] rounded-lg font-semibold hover:opacity-90 transition">
                 Create Free Account
             </a>
         </div>
