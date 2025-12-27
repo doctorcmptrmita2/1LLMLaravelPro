@@ -16,15 +16,26 @@ class AdminController extends Controller
 
     public function index()
     {
-        $users = User::latest()->paginate(20);
-        $stats = [
-            'total_users' => User::count(),
-            'active_users' => User::where('status', 'active')->count(),
-            'suspended_users' => User::where('status', 'suspended')->count(),
-            'total_api_calls' => \App\Models\ApiLog::count(),
-        ];
+        try {
+            $users = User::latest()->paginate(20);
+            
+            $stats = [
+                'total_users' => User::count(),
+                'active_users' => User::where('status', 'active')->count(),
+                'suspended_users' => User::where('status', 'suspended')->count(),
+                'total_api_calls' => \App\Models\ApiLog::count(),
+            ];
 
-        return view('admin.index', compact('users', 'stats'));
+            return view('admin.index', compact('users', 'stats'));
+        } catch (\Exception $e) {
+            \Log::error('Admin panel error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->view('errors.500', [
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show(User $user)
