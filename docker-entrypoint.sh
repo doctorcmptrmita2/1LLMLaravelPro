@@ -8,7 +8,27 @@ echo "Starting application..."
 echo "Waiting for database connection..."
 timeout=30
 counter=0
-until php artisan db:show --quiet 2>/dev/null || [ $counter -ge $timeout ]; do
+
+# Simple database connection test (doesn't require intl extension)
+DB_TEST_SCRIPT="
+<?php
+try {
+    \$host = getenv('DB_HOST') ?: 'postgres';
+    \$port = getenv('DB_PORT') ?: '5432';
+    \$dbname = getenv('DB_DATABASE') ?: 'codexflow';
+    \$username = getenv('DB_USERNAME') ?: 'postgres';
+    \$password = getenv('DB_PASSWORD') ?: '';
+    
+    \$dsn = \"pgsql:host=\$host;port=\$port;dbname=\$dbname\";
+    \$pdo = new PDO(\$dsn, \$username, \$password);
+    \$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    exit(0);
+} catch (Exception \$e) {
+    exit(1);
+}
+"
+
+until php -r "$DB_TEST_SCRIPT" 2>/dev/null || [ $counter -ge $timeout ]; do
     echo "Database is unavailable - sleeping ($counter/$timeout)"
     sleep 1
     counter=$((counter + 1))
@@ -40,4 +60,3 @@ php artisan optimize || true
 echo "Application is ready!"
 
 exec "$@"
-
