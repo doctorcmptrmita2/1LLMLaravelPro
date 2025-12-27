@@ -29,14 +29,18 @@ class AdminMiddleware
             $hasIsAdminColumn = false;
         }
         
-        // If column doesn't exist, redirect with message
+        // If column doesn't exist, redirect to dashboard with message
         if (!$hasIsAdminColumn) {
-            return redirect()->route('dashboard')->with('error', 'Admin panel is not available. Please run migration: php artisan migrate');
+            return redirect()->route('dashboard')->with('error', 'Admin panel requires migration. Please run: php artisan migrate');
         }
         
         // Check if user is admin
-        if (!isset($user->is_admin) || !$user->is_admin) {
-            abort(403, 'Unauthorized. Admin access required.');
+        // Laravel models return null for non-existent attributes, so we check both existence and value
+        $isAdmin = isset($user->is_admin) && $user->is_admin === true;
+        
+        if (!$isAdmin) {
+            // If user is not admin, show 403 but don't redirect to login (user is already logged in)
+            abort(403, 'Unauthorized. Admin access required. Your account does not have admin privileges.');
         }
 
         return $next($request);
