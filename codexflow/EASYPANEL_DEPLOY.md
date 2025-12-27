@@ -12,6 +12,15 @@
    - **Port:** `8001`
    - **Domain:** `dashboard.codexflow.dev` (veya kendi domain'iniz)
 
+### 1.1. Build Context Ayarı (ÖNEMLİ!)
+
+**Settings** → **Build Settings** bölümüne gidin:
+
+- **Build Context:** `codexflow` (veya `.`)
+- **Dockerfile Path:** `codexflow/Dockerfile` (veya sadece `Dockerfile` eğer context `codexflow` ise)
+
+**Not:** Dockerfile `codexflow/` klasörü içinde olduğu için build context'i doğru ayarlamanız gerekiyor!
+
 ### 2. Git Repository Bağla
 
 - Repository URL'ini girin

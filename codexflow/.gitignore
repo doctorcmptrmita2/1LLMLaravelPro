@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Database
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# Docker
+.dockerignore
+docker-entrypoint.sh

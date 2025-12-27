@@ -1,59 +1,187 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CodexFlow Dashboard
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Profesyonel AI API kullanım takip ve yönetim platformu**
 
-## About Laravel
+CodexFlow, LiteLLM proxy ile entegre çalışan, gerçek zamanlı API kullanım analizi, maliyet takibi ve rate limit yönetimi sağlayan modern bir Laravel dashboard uygulamasıdır.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Özellikler
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- ✅ **Real-time Usage Tracking** - API çağrılarını gerçek zamanlı takip
+- ✅ **Cost Analytics** - Detaylı maliyet analizi ve trend grafikleri
+- ✅ **Rate Limit Monitoring** - Günlük/aylık limit takibi ve uyarılar
+- ✅ **Model Management** - AI model seçimi ve favoriler
+- ✅ **API Key Management** - Güvenli API key yönetimi
+- ✅ **Usage Reports** - Detaylı kullanım raporları ve CSV export
+- ✅ **LiteLLM Integration** - LiteLLM proxy ile otomatik entegrasyon
+- ✅ **Beautiful UI** - Modern dark theme, responsive tasarım
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📋 Gereksinimler
 
-## Learning Laravel
+- PHP 8.3+
+- Composer
+- Node.js 20+
+- PostgreSQL veya SQLite
+- Docker (opsiyonel, Easypanel deployment için)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🛠️ Kurulum
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Repository'yi Klonlayın
 
-## Laravel Sponsors
+```bash
+git clone https://github.com/doctorcmptrmita2/1LLMLaravelPro.git
+cd 1LLMLaravelPro/codexflow
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Dependencies Yükleyin
 
-### Premium Partners
+```bash
+composer install
+npm install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 3. Environment Yapılandırması
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+`.env` dosyasını düzenleyin:
+```env
+APP_NAME=CodexFlow
+APP_URL=http://localhost:8000
 
-## Code of Conduct
+DB_CONNECTION=sqlite
+# veya PostgreSQL için:
+# DB_CONNECTION=pgsql
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
+# DB_DATABASE=codexflow
+# DB_USERNAME=codexflow_user
+# DB_PASSWORD=your_password
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# LiteLLM Integration
+LITELLM_WEBHOOK_KEY=your_secure_webhook_key
+LITELLM_PROXY_URL=https://proxyapison-litellmproxyv1.lc58dd.easypanel.host
+```
 
-## Security Vulnerabilities
+### 4. Database Setup
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan migrate
+php artisan storage:link
+```
 
-## License
+### 5. Assets Build
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+npm run build
+```
+
+### 6. Development Server
+
+```bash
+php artisan serve
+```
+
+Uygulama `http://localhost:8000` adresinde çalışacaktır.
+
+## 🐳 Docker ile Çalıştırma
+
+Detaylı bilgi için `README_DOCKER.md` dosyasına bakın.
+
+```bash
+docker-compose up -d
+```
+
+## 🚀 Easypanel Deployment
+
+Easypanel'de deploy etmek için `EASYPANEL_DEPLOY.md` dosyasına bakın.
+
+## 🔗 LiteLLM Entegrasyonu
+
+LiteLLM proxy ile entegrasyon için `LITELLM_INTEGRATION.md` dosyasına bakın.
+
+## 📁 Proje Yapısı
+
+```
+codexflow/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/Api/    # API Controllers
+│   │   └── Middleware/         # Custom Middleware
+│   ├── Models/                 # Eloquent Models
+│   └── Services/               # Business Logic
+├── database/
+│   └── migrations/             # Database Migrations
+├── resources/
+│   ├── views/                  # Blade Templates
+│   ├── css/                    # Tailwind CSS
+│   └── js/                     # JavaScript
+├── routes/
+│   ├── api.php                 # API Routes
+│   └── web.php                 # Web Routes
+├── docker/                     # Docker Configs
+├── Dockerfile                  # Docker Image
+└── docker-compose.yml          # Docker Compose
+```
+
+## 🔐 API Authentication
+
+API authentication için Laravel Sanctum kullanılmaktadır.
+
+### Register
+```bash
+POST /api/auth/register
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password",
+  "password_confirmation": "password"
+}
+```
+
+### Login
+```bash
+POST /api/auth/login
+{
+  "email": "john@example.com",
+  "password": "password"
+}
+```
+
+### Protected Endpoints
+Tüm protected endpoint'ler için `Authorization: Bearer {token}` header'ı gereklidir.
+
+## 📊 API Endpoints
+
+- `GET /api/dashboard/stats` - Dashboard istatistikleri
+- `GET /api/dashboard/usage` - Kullanım grafikleri
+- `GET /api/usage/logs` - API logları
+- `GET /api/usage/analytics` - Analytics verileri
+- `POST /api/usage/export` - CSV export
+- `GET /api/rate-limits` - Rate limit durumu
+- `GET /api/models` - Mevcut modeller
+- `GET /api/settings` - Kullanıcı ayarları
+
+## 🧪 Testing
+
+```bash
+php artisan test
+```
+
+## 📝 License
+
+MIT License
+
+## 🤝 Contributing
+
+Pull request'ler memnuniyetle karşılanır. Büyük değişiklikler için lütfen önce bir issue açın.
+
+## 📞 Support
+
+Sorularınız için GitHub Issues kullanabilirsiniz.
+
+---
+
+**CodexFlow ile AI API kullanımınızı profesyonelce yönetin! 🚀**
