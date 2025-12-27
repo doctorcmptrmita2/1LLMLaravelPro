@@ -122,7 +122,7 @@
         </div>
 
         <!-- Recent Logs -->
-        <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
+        <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a] mb-8">
             <h3 class="text-lg font-semibold mb-4">Recent API Calls</h3>
             
             <div class="overflow-x-auto">
@@ -146,6 +146,166 @@
                 </table>
             </div>
         </div>
+
+        @if(isset(auth()->user()->is_admin) && auth()->user()->is_admin)
+        <!-- Admin Section -->
+        <div class="border-t border-[#1a1f3a] pt-8 mt-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-[#FF6B6B] to-[#FFCC66] bg-clip-text text-transparent">
+                        🔐 Admin Panel
+                    </h2>
+                    <p class="text-gray-400 text-sm mt-1">Kullanıcı yönetimi ve API key atama</p>
+                </div>
+            </div>
+
+            @if(isset($adminStats) && $adminStats)
+            <!-- Admin Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gradient-to-br from-[#FF6B6B]/20 to-[#FF6B6B]/5 rounded-lg p-6 border border-[#FF6B6B]/30">
+                    <h3 class="text-sm text-gray-400 mb-2">Total Users</h3>
+                    <p class="text-3xl font-bold text-[#FF6B6B]">{{ $adminStats['total_users'] }}</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-[#3EE48B]/20 to-[#3EE48B]/5 rounded-lg p-6 border border-[#3EE48B]/30">
+                    <h3 class="text-sm text-gray-400 mb-2">Active Users</h3>
+                    <p class="text-3xl font-bold text-[#3EE48B]">{{ $adminStats['active_users'] }}</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-[#FFCC66]/20 to-[#FFCC66]/5 rounded-lg p-6 border border-[#FFCC66]/30">
+                    <h3 class="text-sm text-gray-400 mb-2">Suspended Users</h3>
+                    <p class="text-3xl font-bold text-[#FFCC66]">{{ $adminStats['suspended_users'] }}</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-[#6D5CFF]/20 to-[#6D5CFF]/5 rounded-lg p-6 border border-[#6D5CFF]/30">
+                    <h3 class="text-sm text-gray-400 mb-2">Total API Calls</h3>
+                    <p class="text-3xl font-bold text-[#6D5CFF]">{{ number_format($adminStats['total_api_calls']) }}</p>
+                </div>
+            </div>
+            @endif
+
+            <!-- Assign API Key Form -->
+            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a] mb-8">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-[#6D5CFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    Assign API Key to User
+                </h3>
+                <form action="{{ route('admin.users.assign-api-key') }}" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4" id="assign-api-key-form">
+                    @csrf
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Email Address</label>
+                        <input type="email" name="email" required 
+                            class="w-full px-4 py-2 bg-[#1a1f3a] border border-[#1a1f3a] rounded-lg text-white focus:border-[#6D5CFF] focus:outline-none transition"
+                            placeholder="doctor.cmptr.mita2@gmail.com"
+                            value="{{ old('email') }}">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">API Key</label>
+                        <input type="text" name="api_key" required 
+                            class="w-full px-4 py-2 bg-[#1a1f3a] border border-[#1a1f3a] rounded-lg text-white font-mono text-sm focus:border-[#6D5CFF] focus:outline-none transition"
+                            placeholder="sk-7Cif43XHbgNSMtSIaul_Xw"
+                            value="{{ old('api_key') }}">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full px-6 py-2 bg-gradient-to-r from-[#6D5CFF] to-[#22D3EE] rounded-lg font-semibold hover:opacity-90 transition">
+                            Assign API Key
+                        </button>
+                    </div>
+                </form>
+                @if($errors->any())
+                    <div class="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400">
+                        <ul class="list-disc list-inside">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Users Table -->
+            @if(isset($users) && $users->count() > 0)
+            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-[#22D3EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Recent Users
+                </h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-[#1a1f3a]">
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">ID</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">Name</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">Email</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">API Key</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">Plan</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">Status</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">Role</th>
+                                <th class="text-left py-3 px-4 text-gray-400 text-sm">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users as $user)
+                                <tr class="border-b border-[#1a1f3a] hover:bg-[#1a1f3a] transition">
+                                    <td class="py-3 px-4">{{ $user->id }}</td>
+                                    <td class="py-3 px-4">{{ $user->name }}</td>
+                                    <td class="py-3 px-4">{{ $user->email }}</td>
+                                    <td class="py-3 px-4">
+                                        <code class="text-xs text-gray-400 font-mono">
+                                            {{ $user->api_key ? substr($user->api_key, 0, 20) . '...' : 'N/A' }}
+                                        </code>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span class="px-2 py-1 rounded text-xs capitalize bg-[#1a1f3a]">
+                                            {{ $user->plan }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span class="px-2 py-1 rounded text-xs font-medium {{ 
+                                            $user->status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' 
+                                        }}">
+                                            {{ $user->status }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        @if(isset($user->is_admin) && $user->is_admin)
+                                            <span class="px-2 py-1 rounded text-xs bg-purple-500/20 text-purple-400 font-medium">Admin</span>
+                                        @else
+                                            <span class="text-gray-500 text-xs">User</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex space-x-2">
+                                            <form action="{{ route('admin.users.suspend', $user) }}" method="POST" class="inline" onsubmit="return confirm('Kullanıcıyı askıya almak istediğinize emin misiniz?')">
+                                                @csrf
+                                                @if($user->status === 'active')
+                                                    <button type="submit" class="text-xs text-yellow-400 hover:text-yellow-300">Suspend</button>
+                                                @else
+                                                    <button type="submit" formaction="{{ route('admin.users.activate', $user) }}" class="text-xs text-green-400 hover:text-green-300">Activate</button>
+                                                @endif
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="{{ route('admin.index') }}" class="text-[#22D3EE] hover:underline text-sm">
+                        View All Users →
+                    </a>
+                </div>
+            </div>
+            @endif
+        </div>
+        @endif
     </div>
 
     <script>
@@ -363,6 +523,41 @@
                 }
             }
         });
+
+        // Admin form submission with AJAX
+        const assignForm = document.getElementById('assign-api-key-form');
+        if (assignForm) {
+            assignForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Assigning...';
+                
+                try {
+                    const response = await fetchWithErrorHandling(this.action, {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    
+                    if (response) {
+                        // Reload page to show success message
+                        window.location.reload();
+                    } else {
+                        alert('Error assigning API key. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error assigning API key. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        }
     </script>
 @endsection
 

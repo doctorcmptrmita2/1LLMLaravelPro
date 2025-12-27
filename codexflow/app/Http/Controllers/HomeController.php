@@ -14,7 +14,29 @@ class HomeController extends Controller
 
     public function dashboard()
     {
-        return view('dashboard.index');
+        $user = auth()->user();
+        $isAdmin = isset($user->is_admin) && $user->is_admin;
+        
+        $data = [];
+        
+        if ($isAdmin) {
+            try {
+                $data['adminStats'] = [
+                    'total_users' => \App\Models\User::count(),
+                    'active_users' => \App\Models\User::where('status', 'active')->count(),
+                    'suspended_users' => \App\Models\User::where('status', 'suspended')->count(),
+                    'total_api_calls' => \App\Models\ApiLog::count(),
+                ];
+                
+                $data['users'] = \App\Models\User::latest()->limit(10)->get();
+            } catch (\Exception $e) {
+                // Migration henüz çalıştırılmamış olabilir
+                $data['adminStats'] = null;
+                $data['users'] = collect();
+            }
+        }
+        
+        return view('dashboard.index', $data);
     }
 
     public function analytics()
