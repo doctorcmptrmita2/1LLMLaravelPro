@@ -14,26 +14,60 @@
     @endif
 
     <div id="dashboard-app" data-user="{{ json_encode(auth()->user()) }}">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Welcome back, {{ auth()->user()->name }}!</h1>
+            <p class="text-gray-400">Here's your API usage overview</p>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
-                <h3 class="text-sm text-gray-400 mb-2">API Calls Today</h3>
-                <p class="text-3xl font-bold" id="api-calls">-</p>
+            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a] hover:border-[#6D5CFF]/50 transition">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm text-gray-400">API Calls Today</h3>
+                    <svg class="w-5 h-5 text-[#6D5CFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-bold bg-gradient-to-r from-[#6D5CFF] to-[#22D3EE] bg-clip-text text-transparent" id="api-calls">
+                    <span class="inline-block animate-pulse">-</span>
+                </p>
             </div>
             
-            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
-                <h3 class="text-sm text-gray-400 mb-2">Tokens Used</h3>
-                <p class="text-3xl font-bold" id="tokens-used">-</p>
+            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a] hover:border-[#22D3EE]/50 transition">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm text-gray-400">Tokens Used</h3>
+                    <svg class="w-5 h-5 text-[#22D3EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-bold bg-gradient-to-r from-[#22D3EE] to-[#3EE48B] bg-clip-text text-transparent" id="tokens-used">
+                    <span class="inline-block animate-pulse">-</span>
+                </p>
             </div>
             
-            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
-                <h3 class="text-sm text-gray-400 mb-2">Total Cost</h3>
-                <p class="text-3xl font-bold" id="total-cost">-</p>
+            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a] hover:border-[#3EE48B]/50 transition">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm text-gray-400">Total Cost</h3>
+                    <svg class="w-5 h-5 text-[#3EE48B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-bold bg-gradient-to-r from-[#3EE48B] to-[#6D5CFF] bg-clip-text text-transparent" id="total-cost">
+                    <span class="inline-block animate-pulse">-</span>
+                </p>
             </div>
             
-            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
-                <h3 class="text-sm text-gray-400 mb-2">Avg Response Time</h3>
-                <p class="text-3xl font-bold" id="avg-response-time">-</p>
+            <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a] hover:border-[#FFCC66]/50 transition">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm text-gray-400">Avg Response Time</h3>
+                    <svg class="w-5 h-5 text-[#FFCC66]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <p class="text-3xl font-bold text-[#FFCC66]" id="avg-response-time">
+                    <span class="inline-block animate-pulse">-</span>
+                </p>
             </div>
         </div>
 
@@ -42,13 +76,19 @@
             <!-- Token Usage Chart -->
             <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
                 <h3 class="text-lg font-semibold mb-4">Daily Token Usage</h3>
-                <canvas id="tokenChart"></canvas>
+                <div class="h-64">
+                    <canvas id="tokenChart"></canvas>
+                </div>
+                <p id="token-chart-empty" class="text-center text-gray-400 mt-4 hidden">No data available</p>
             </div>
 
             <!-- Model Distribution -->
             <div class="bg-[#0E1330] rounded-lg p-6 border border-[#1a1f3a]">
                 <h3 class="text-lg font-semibold mb-4">Model Distribution</h3>
-                <canvas id="modelChart"></canvas>
+                <div class="h-64">
+                    <canvas id="modelChart"></canvas>
+                </div>
+                <p id="model-chart-empty" class="text-center text-gray-400 mt-4 hidden">No data available</p>
             </div>
         </div>
 
@@ -184,16 +224,27 @@
             
             // Token Usage Chart
             const tokenChartEl = document.getElementById('tokenChart');
+            const tokenChartEmpty = document.getElementById('token-chart-empty');
             if (tokenChartEl && typeof Chart !== 'undefined') {
                 try {
+                    const dates = data.chart?.dates || [];
+                    const tokens = data.chart?.tokens || [];
+                    
+                    if (dates.length === 0 || tokens.length === 0) {
+                        if (tokenChartEmpty) tokenChartEmpty.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    if (tokenChartEmpty) tokenChartEmpty.classList.add('hidden');
+                    
                     const tokenCtx = tokenChartEl.getContext('2d');
                     new Chart(tokenCtx, {
                         type: 'line',
                         data: {
-                            labels: data.chart?.dates || [],
+                            labels: dates,
                             datasets: [{
                                 label: 'Tokens Used',
-                                data: data.chart?.tokens || [],
+                                data: tokens,
                                 borderColor: '#6D5CFF',
                                 backgroundColor: 'rgba(109, 92, 255, 0.1)',
                                 tension: 0.4,
@@ -207,26 +258,54 @@
                                 legend: { display: false }
                             },
                             scales: {
-                                y: { beginAtZero: true }
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: '#9CA3AF'
+                                    },
+                                    grid: {
+                                        color: 'rgba(26, 31, 58, 0.5)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: '#9CA3AF'
+                                    },
+                                    grid: {
+                                        color: 'rgba(26, 31, 58, 0.5)'
+                                    }
+                                }
                             }
                         }
                     });
                 } catch (error) {
                     console.error('Chart error:', error);
+                    if (tokenChartEmpty) tokenChartEmpty.classList.remove('hidden');
                 }
             }
 
             // Model Distribution Chart
             const modelChartEl = document.getElementById('modelChart');
+            const modelChartEmpty = document.getElementById('model-chart-empty');
             if (modelChartEl && typeof Chart !== 'undefined') {
                 try {
+                    const models = data.model_distribution?.models || [];
+                    const counts = data.model_distribution?.counts || [];
+                    
+                    if (models.length === 0 || counts.length === 0) {
+                        if (modelChartEmpty) modelChartEmpty.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    if (modelChartEmpty) modelChartEmpty.classList.add('hidden');
+                    
                     const modelCtx = modelChartEl.getContext('2d');
                     new Chart(modelCtx, {
                         type: 'doughnut',
                         data: {
-                            labels: data.model_distribution?.models || [],
+                            labels: models,
                             datasets: [{
-                                data: data.model_distribution?.counts || [],
+                                data: counts,
                                 backgroundColor: [
                                     '#6D5CFF',
                                     '#22D3EE',
@@ -240,12 +319,19 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom' }
+                                legend: { 
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#9CA3AF',
+                                        padding: 15
+                                    }
+                                }
                             }
                         }
                     });
                 } catch (error) {
                     console.error('Chart error:', error);
+                    if (modelChartEmpty) modelChartEmpty.classList.remove('hidden');
                 }
             }
 
