@@ -16,4 +16,29 @@ class HomeController extends Controller
     {
         return view('dashboard.index');
     }
+
+    public function analytics()
+    {
+        return view('dashboard.analytics');
+    }
+
+    public function logs()
+    {
+        return view('dashboard.logs');
+    }
+
+    public function rateLimits()
+    {
+        return view('dashboard.rate-limits');
+    }
+
+    public function models()
+    {
+        return view('dashboard.models');
+    }
+
+    public function settings()
+    {
+        return view('dashboard.settings');
+    }
 }

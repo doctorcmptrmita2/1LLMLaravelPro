@@ -51,22 +51,22 @@
             <!-- Sidebar -->
             <aside class="w-64 bg-[#0E1330] min-h-screen border-r border-[#1a1f3a]">
                 <nav class="p-4 space-y-2">
-                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition">
+                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         Dashboard
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition">
+                    <a href="{{ route('dashboard.analytics') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard.analytics') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         Usage Analytics
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition">
+                    <a href="{{ route('dashboard.logs') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard.logs') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         API Logs
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition">
+                    <a href="{{ route('dashboard.rate-limits') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard.rate-limits') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         Rate Limits
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition">
+                    <a href="{{ route('dashboard.models') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard.models') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         Models
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition">
+                    <a href="{{ route('dashboard.settings') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard.settings') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         Settings
                     </a>
                 </nav>
