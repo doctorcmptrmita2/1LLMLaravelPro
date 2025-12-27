@@ -11,31 +11,41 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    nginx \
-    && docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring exif pcntl bcmath gd zip opcache
+    && docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring exif pcntl bcmath gd zip opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Node.js ve npm
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Working directory
 WORKDIR /var/www/html
 
 # Copy composer files from codexflow directory
-COPY codexflow/composer.json codexflow/composer.lock ./
+COPY codexflow/composer.json ./
+COPY codexflow/composer.lock* ./
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# Try with lock file first, if fails try without lock file
+RUN if [ -f composer.lock ]; then \
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs || \
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs --no-scripts; \
+    else \
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs --no-scripts; \
+    fi
 
 # Copy application files from codexflow directory
 COPY codexflow/ .
 
 # Install Node dependencies (if package.json exists)
 RUN if [ -f package.json ]; then \
-        npm install && \
+        npm ci --only=production || npm install --production; \
         npm run build; \
     fi
 
@@ -57,4 +67,3 @@ EXPOSE 9000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
-
