@@ -18,7 +18,12 @@ class DashboardController extends Controller
 
     public function stats(Request $request)
     {
-        $user = $request->user();
+        // Support both Sanctum and Web auth
+        $user = $request->user() ?? auth()->user();
+        
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         
         $todayStats = $this->usageService->getTodayStats($user);
         $rateLimits = $this->rateLimitService->getRateLimits($user);
@@ -31,7 +36,12 @@ class DashboardController extends Controller
 
     public function usage(Request $request)
     {
-        $user = $request->user();
+        // Support both Sanctum and Web auth
+        $user = $request->user() ?? auth()->user();
+        
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
         
         $chartData = $this->usageService->getUsageChartData($user);
         $modelDistribution = $this->usageService->getModelDistribution($user);

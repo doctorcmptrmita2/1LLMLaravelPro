@@ -69,6 +69,13 @@
                     <a href="{{ route('dashboard.settings') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('dashboard.settings') ? 'bg-[#1a1f3a] border-l-2 border-[#6D5CFF]' : '' }}">
                         Settings
                     </a>
+                    @if(auth()->user()->is_admin)
+                    <div class="pt-4 mt-4 border-t border-[#1a1f3a]">
+                        <a href="{{ route('admin.index') }}" class="block px-4 py-2 rounded-lg hover:bg-[#1a1f3a] transition {{ request()->routeIs('admin.*') ? 'bg-[#1a1f3a] border-l-2 border-[#FF6B6B]' : '' }} text-[#FF6B6B]">
+                            Admin Panel
+                        </a>
+                    </div>
+                    @endif
                 </nav>
             </aside>
 

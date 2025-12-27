@@ -25,3 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/models', [HomeController::class, 'models'])->name('dashboard.models');
     Route::get('/dashboard/settings', [HomeController::class, 'settings'])->name('dashboard.settings');
 });
+
+// Admin Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\AdminController::class, 'index'])->name('index');
+    Route::get('/users/{user}', [\App\Http\Controllers\Admin\AdminController::class, 'show'])->name('users.show');
+    Route::post('/users/{user}/api-key', [\App\Http\Controllers\Admin\AdminController::class, 'updateApiKey'])->name('users.update-api-key');
+    Route::post('/users/assign-api-key', [\App\Http\Controllers\Admin\AdminController::class, 'assignApiKey'])->name('users.assign-api-key');
+    Route::post('/users/{user}/update', [\App\Http\Controllers\Admin\AdminController::class, 'updateUser'])->name('users.update');
+    Route::post('/users/{user}/suspend', [\App\Http\Controllers\Admin\AdminController::class, 'suspendUser'])->name('users.suspend');
+    Route::post('/users/{user}/activate', [\App\Http\Controllers\Admin\AdminController::class, 'activateUser'])->name('users.activate');
+});

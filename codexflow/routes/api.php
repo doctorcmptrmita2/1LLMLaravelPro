@@ -16,8 +16,8 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/webhook/litellm', [UsageController::class, 'litellmWebhook'])
     ->middleware('litellm.webhook');
 
-// Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+// Protected routes (works with both Sanctum and Web auth)
+Route::middleware('auth')->group(function () {
     // Auth
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);

@@ -97,124 +97,172 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('auth_token');
+        // CSRF token for API requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         
-        // Fetch dashboard stats
-        fetch('/api/dashboard/stats', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
+        // Helper function for fetch with error handling
+        async function fetchWithErrorHandling(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        ...options.headers
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return null;
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('api-calls').textContent = data.today?.api_calls || 0;
-            document.getElementById('tokens-used').textContent = (data.today?.tokens_used || 0).toLocaleString();
-            document.getElementById('total-cost').textContent = '$' + (data.today?.total_cost || 0).toFixed(4);
-            document.getElementById('avg-response-time').textContent = (data.today?.avg_response_time || 0) + 'ms';
+        }
+
+        // Fetch dashboard stats
+        fetchWithErrorHandling('/api/dashboard/stats').then(data => {
+            if (!data) return;
+            
+            const today = data.today || {};
+            const rateLimits = data.rate_limits || {};
+            
+            // Update stats
+            const apiCallsEl = document.getElementById('api-calls');
+            const tokensUsedEl = document.getElementById('tokens-used');
+            const totalCostEl = document.getElementById('total-cost');
+            const avgResponseTimeEl = document.getElementById('avg-response-time');
+            
+            if (apiCallsEl) apiCallsEl.textContent = today.api_calls || 0;
+            if (tokensUsedEl) tokensUsedEl.textContent = (today.tokens_used || 0).toLocaleString();
+            if (totalCostEl) totalCostEl.textContent = '$' + (today.total_cost || 0).toFixed(4);
+            if (avgResponseTimeEl) avgResponseTimeEl.textContent = (today.avg_response_time || 0) + 'ms';
             
             // Rate limits
-            const daily = data.rate_limits?.daily || {};
-            const monthly = data.rate_limits?.monthly || {};
+            const daily = rateLimits.daily || {};
+            const monthly = rateLimits.monthly || {};
             
-            document.getElementById('daily-tokens').textContent = 
-                `${(daily.used || 0).toLocaleString()} / ${(daily.limit || 0).toLocaleString()}`;
-            document.getElementById('monthly-tokens').textContent = 
-                `${(monthly.used || 0).toLocaleString()} / ${(monthly.limit || 0).toLocaleString()}`;
+            const dailyTokensEl = document.getElementById('daily-tokens');
+            const monthlyTokensEl = document.getElementById('monthly-tokens');
+            const dailyProgressEl = document.getElementById('daily-progress');
+            const monthlyProgressEl = document.getElementById('monthly-progress');
             
-            const dailyPercent = daily.limit ? (daily.used / daily.limit) * 100 : 0;
-            const monthlyPercent = monthly.limit ? (monthly.used / monthly.limit) * 100 : 0;
+            if (dailyTokensEl) {
+                dailyTokensEl.textContent = `${(daily.used || 0).toLocaleString()} / ${(daily.limit || 0).toLocaleString()}`;
+            }
+            if (monthlyTokensEl) {
+                monthlyTokensEl.textContent = `${(monthly.used || 0).toLocaleString()} / ${(monthly.limit || 0).toLocaleString()}`;
+            }
             
-            document.getElementById('daily-progress').style.width = Math.min(dailyPercent, 100) + '%';
-            document.getElementById('monthly-progress').style.width = Math.min(monthlyPercent, 100) + '%';
+            const dailyPercent = daily.limit ? Math.min((daily.used / daily.limit) * 100, 100) : 0;
+            const monthlyPercent = monthly.limit ? Math.min((monthly.used / monthly.limit) * 100, 100) : 0;
+            
+            if (dailyProgressEl) dailyProgressEl.style.width = dailyPercent + '%';
+            if (monthlyProgressEl) monthlyProgressEl.style.width = monthlyPercent + '%';
         });
 
         // Fetch usage data
-        fetch('/api/dashboard/usage', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+        fetchWithErrorHandling('/api/dashboard/usage').then(data => {
+            if (!data) return;
+            
             // Token Usage Chart
-            const tokenCtx = document.getElementById('tokenChart').getContext('2d');
-            new Chart(tokenCtx, {
-                type: 'line',
-                data: {
-                    labels: data.chart?.dates || [],
-                    datasets: [{
-                        label: 'Tokens Used',
-                        data: data.chart?.tokens || [],
-                        borderColor: '#6D5CFF',
-                        backgroundColor: 'rgba(109, 92, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
+            const tokenChartEl = document.getElementById('tokenChart');
+            if (tokenChartEl && typeof Chart !== 'undefined') {
+                try {
+                    const tokenCtx = tokenChartEl.getContext('2d');
+                    new Chart(tokenCtx, {
+                        type: 'line',
+                        data: {
+                            labels: data.chart?.dates || [],
+                            datasets: [{
+                                label: 'Tokens Used',
+                                data: data.chart?.tokens || [],
+                                borderColor: '#6D5CFF',
+                                backgroundColor: 'rgba(109, 92, 255, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Chart error:', error);
                 }
-            });
+            }
 
             // Model Distribution Chart
-            const modelCtx = document.getElementById('modelChart').getContext('2d');
-            new Chart(modelCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.model_distribution?.models || [],
-                    datasets: [{
-                        data: data.model_distribution?.counts || [],
-                        backgroundColor: [
-                            '#6D5CFF',
-                            '#22D3EE',
-                            '#3EE48B',
-                            '#FFCC66',
-                            '#FF6B6B',
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
+            const modelChartEl = document.getElementById('modelChart');
+            if (modelChartEl && typeof Chart !== 'undefined') {
+                try {
+                    const modelCtx = modelChartEl.getContext('2d');
+                    new Chart(modelCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.model_distribution?.models || [],
+                            datasets: [{
+                                data: data.model_distribution?.counts || [],
+                                backgroundColor: [
+                                    '#6D5CFF',
+                                    '#22D3EE',
+                                    '#3EE48B',
+                                    '#FFCC66',
+                                    '#FF6B6B',
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Chart error:', error);
                 }
-            });
+            }
 
             // Recent Logs
             const logsBody = document.getElementById('logs-table-body');
-            if (data.recent_logs && data.recent_logs.length > 0) {
-                logsBody.innerHTML = data.recent_logs.map(log => `
-                    <tr class="border-b border-[#1a1f3a] hover:bg-[#1a1f3a]">
-                        <td class="py-3 px-4">${log.model}</td>
-                        <td class="py-3 px-4">${log.input_tokens.toLocaleString()}</td>
-                        <td class="py-3 px-4">${log.output_tokens.toLocaleString()}</td>
-                        <td class="py-3 px-4">$${log.total_cost.toFixed(4)}</td>
-                        <td class="py-3 px-4">${log.response_time_ms}ms</td>
-                        <td class="py-3 px-4">
-                            <span class="px-2 py-1 rounded text-xs font-medium ${
-                                log.status === 'success' ? 'bg-green-500/20 text-green-400' :
-                                log.status === 'error' ? 'bg-red-500/20 text-red-400' :
-                                'bg-yellow-500/20 text-yellow-400'
-                            }">
-                                ${log.status}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-gray-400 text-sm">${new Date(log.created_at).toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            } else {
-                logsBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">No logs found</td></tr>';
+            if (logsBody) {
+                if (data.recent_logs && data.recent_logs.length > 0) {
+                    logsBody.innerHTML = data.recent_logs.map(log => `
+                        <tr class="border-b border-[#1a1f3a] hover:bg-[#1a1f3a]">
+                            <td class="py-3 px-4">${log.model || 'N/A'}</td>
+                            <td class="py-3 px-4">${(log.input_tokens || 0).toLocaleString()}</td>
+                            <td class="py-3 px-4">${(log.output_tokens || 0).toLocaleString()}</td>
+                            <td class="py-3 px-4">$${(log.total_cost || 0).toFixed(4)}</td>
+                            <td class="py-3 px-4">${log.response_time_ms || 0}ms</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 rounded text-xs font-medium ${
+                                    log.status === 'success' ? 'bg-green-500/20 text-green-400' :
+                                    log.status === 'error' ? 'bg-red-500/20 text-red-400' :
+                                    'bg-yellow-500/20 text-yellow-400'
+                                }">
+                                    ${log.status || 'unknown'}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-gray-400 text-sm">${log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    logsBody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">No logs found</td></tr>';
+                }
             }
         });
     </script>

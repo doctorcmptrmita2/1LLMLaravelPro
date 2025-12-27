@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'litellm.webhook' => \App\Http\Middleware\VerifyLiteLLMWebhook::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
         
         $middleware->redirectGuestsTo(fn () => route('login'));
