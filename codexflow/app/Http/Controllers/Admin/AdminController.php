@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -17,6 +19,12 @@ class AdminController extends Controller
     public function index()
     {
         try {
+            // Check if is_admin column exists
+            $columns = DB::select("SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'is_admin'");
+            if (empty($columns)) {
+                return redirect()->route('dashboard')->with('error', 'Admin panel requires migration. Please run: php artisan migrate');
+            }
+            
             $users = User::latest()->paginate(20);
             
             $stats = [
@@ -28,13 +36,14 @@ class AdminController extends Controller
 
             return view('admin.index', compact('users', 'stats'));
         } catch (\Exception $e) {
-            \Log::error('Admin panel error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Admin panel error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
             
-            return response()->view('errors.500', [
-                'message' => $e->getMessage()
-            ], 500);
+            // Return friendly error message
+            return redirect()->route('dashboard')->with('error', 'Admin panel error: ' . $e->getMessage());
         }
     }
 

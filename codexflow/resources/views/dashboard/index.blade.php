@@ -1,6 +1,18 @@
 @extends('layouts.dashboard')
 
 @section('content')
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400">
+            <p class="font-semibold">⚠️ {{ session('error') }}</p>
+        </div>
+    @endif
+    
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400">
+            <p class="font-semibold">✅ {{ session('success') }}</p>
+        </div>
+    @endif
+
     <div id="dashboard-app" data-user="{{ json_encode(auth()->user()) }}">
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
