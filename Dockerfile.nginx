@@ -1,4 +1,7 @@
-FROM php:8.3-cli
+# Bu Dockerfile Nginx ile birlikte kullanılmak üzere hazırlanmıştır
+# PHP-FPM container'ı için
+
+FROM php:8.3-fpm
 
 # System dependencies
 RUN apt-get update && apt-get install -y \
@@ -36,7 +39,6 @@ COPY codexflow/composer.json ./
 COPY codexflow/composer.lock* ./
 
 # Install PHP dependencies
-# Try with lock file first, if fails try without lock file
 RUN if [ -f composer.lock ]; then \
         composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs || \
         composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs --no-scripts; \
@@ -48,9 +50,7 @@ RUN if [ -f composer.lock ]; then \
 COPY codexflow/ .
 
 # Install Node dependencies (if package.json exists)
-# Make npm optional - if it fails, continue anyway
 RUN if [ -f package.json ] && command -v npm > /dev/null 2>&1; then \
-        echo "Found package.json and npm, installing dependencies..." && \
         npm install --production && \
         npm run build || echo "npm build failed, continuing..."; \
     elif [ -f package.json ]; then \
@@ -73,7 +73,8 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 8000
+EXPOSE 9000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+CMD ["php-fpm"]
+

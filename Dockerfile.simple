@@ -1,3 +1,6 @@
+# Basit PHP built-in server kullanan Dockerfile
+# Nginx gerektirmez
+
 FROM php:8.3-cli
 
 # System dependencies
@@ -18,16 +21,6 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Node.js ve npm - Install using official method
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get update \
-    && apt-get install -y nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# Verify Node.js and npm installation
-RUN node --version && npm --version || (echo "Node.js/npm installation failed" && exit 1)
-
 # Working directory
 WORKDIR /var/www/html
 
@@ -36,7 +29,6 @@ COPY codexflow/composer.json ./
 COPY codexflow/composer.lock* ./
 
 # Install PHP dependencies
-# Try with lock file first, if fails try without lock file
 RUN if [ -f composer.lock ]; then \
         composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs || \
         composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs --no-scripts; \
@@ -47,27 +39,10 @@ RUN if [ -f composer.lock ]; then \
 # Copy application files from codexflow directory
 COPY codexflow/ .
 
-# Install Node dependencies (if package.json exists)
-# Make npm optional - if it fails, continue anyway
-RUN if [ -f package.json ] && command -v npm > /dev/null 2>&1; then \
-        echo "Found package.json and npm, installing dependencies..." && \
-        npm install --production && \
-        npm run build || echo "npm build failed, continuing..."; \
-    elif [ -f package.json ]; then \
-        echo "package.json found but npm not available, skipping npm install"; \
-    else \
-        echo "No package.json found, skipping npm install"; \
-    fi
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
-
-# PHP-FPM configuration
-RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.max_accelerated_files=20000" >> /usr/local/etc/php/conf.d/opcache.ini
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/
@@ -77,3 +52,4 @@ EXPOSE 8000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+
