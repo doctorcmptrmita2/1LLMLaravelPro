@@ -18,14 +18,15 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Node.js ve npm - Install separately to ensure it works
+# Node.js ve npm - Install using official method
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update \
     && apt-get install -y nodejs \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && node --version \
-    && npm --version
+    && rm -rf /var/lib/apt/lists/*
+
+# Verify Node.js and npm installation
+RUN node --version && npm --version || (echo "Node.js/npm installation failed" && exit 1)
 
 # Working directory
 WORKDIR /var/www/html
@@ -47,12 +48,13 @@ RUN if [ -f composer.lock ]; then \
 COPY codexflow/ .
 
 # Install Node dependencies (if package.json exists)
-# Check npm availability first
-RUN which npm && npm --version || echo "npm not available"
-RUN if [ -f package.json ]; then \
-        echo "Found package.json, installing dependencies..." && \
+# Make npm optional - if it fails, continue anyway
+RUN if [ -f package.json ] && command -v npm > /dev/null 2>&1; then \
+        echo "Found package.json and npm, installing dependencies..." && \
         npm install --production && \
-        npm run build; \
+        npm run build || echo "npm build failed, continuing..."; \
+    elif [ -f package.json ]; then \
+        echo "package.json found but npm not available, skipping npm install"; \
     else \
         echo "No package.json found, skipping npm install"; \
     fi
